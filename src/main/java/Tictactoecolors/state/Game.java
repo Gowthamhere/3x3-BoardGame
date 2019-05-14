@@ -1,4 +1,14 @@
 package Tictactoecolors.state;
+import Tictactoecolors.result.GameResult;
+import Tictactoecolors.result.GameResultDao;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import util.guice.PersistenceModule;
+
+import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Scanner;
 
 public class Game {
@@ -51,9 +61,30 @@ public class Game {
         }
         if (state.getWinner() != null) {
             System.out.println(state.getWinner().getPlayer_Name() + " won");
+
         }
         else {
             System.out.println("Draw");
         }
-}
+
+        Injector injector = Guice.createInjector(new PersistenceModule("board_game"));
+        GameResultDao gameResultDao = injector.getInstance(GameResultDao.class);
+
+            GameResult result = GameResult.builder()
+                    .player(String.valueOf(state.getWinner().getPlayer_Name()))
+                    .solved(state.isGameOver())
+                    .score(state.getWinner().getNumberOfSteps())
+                    .timestamp(ZonedDateTime.now())
+                    .build();
+
+        gameResultDao.persist(result);
+        System.out.println(result);
+
+        List<GameResult> resultList = gameResultDao.findBest(2);
+
+        for(GameResult gameResult : resultList) {
+            System.out.println(gameResult.toString());
+        }
+
+    }
 }
