@@ -1,9 +1,7 @@
 package Tictactoecolors.state;
 
 import lombok.Getter;
-import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
 
 /**
  * Class representing the possible stones for each player.
@@ -22,19 +20,16 @@ public enum Stones {
 
     private char representation;
 
-    @NotNull
-    @Setter
-    private int numberOfSteps;
-
-    @NotNull
-    @Setter
-    private String player_Name;
-
 
     Stones(char letter) {
         this.representation = letter;
-        this.numberOfSteps = 0;
     }
+
+    /**
+     * A method that returns the next player.
+     * @return the next player
+     * @throws AssertionError if there is no valid opponent
+     */
 
     public Stones nextPlayer() {
         switch (this) {

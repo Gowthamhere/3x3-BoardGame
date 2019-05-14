@@ -6,8 +6,19 @@ package Tictactoecolors.state;
 
 public class BoardCell {
 
+    /**
+     * The row location.
+     */
     private int row;
+
+    /**
+     * The column location.
+     */
     private int column;
+
+    /**
+     * The symbol representing empty space on the board.
+     */
     public final char EMPTY = '_';
 
     public BoardCell() {

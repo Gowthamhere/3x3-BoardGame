@@ -3,17 +3,31 @@ import Tictactoecolors.result.GameResult;
 import Tictactoecolors.result.GameResultDao;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import lombok.extern.slf4j.Slf4j;
 import util.guice.PersistenceModule;
 
-import javax.inject.Inject;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Scanner;
 
+
+/**
+ * The main class of the game where the game can be played.
+ */
+@Slf4j
 public class Game {
 
+    /**
+     * The main method of the class that allows the players to play the game
+     * It takes players names and saves them in {@code Player1} and {@code Player2}
+     * respectively
+     * It allows the players to make the moves based on the {@code Stones_State} class and also
+     * persists the winner and runner data into the database.
+     * @param args
+     */
     public static void main(String[] args) {
+        Injector injector;
+        GameResultDao gameResultDao;
         Stones_State state = new Stones_State();
         Scanner scanner = new Scanner(System.in);
         String Player1;
@@ -32,19 +46,23 @@ public class Game {
                 break;
         }
 
+
         do {
             System.out.print("Player 1, enter your name: ");
             Player1 = scanner.nextLine();
-            state.getCurrentStone().setPlayer_Name(Player1);
+            state.getCurrentStone();
+            state.setPlayer1(Player1);
 
         }while(Player1.equals(null) || Player1.length() < 1);
 
         do {
             System.out.print("Player 2, enter your name: ");
             Player2 = scanner.nextLine();
-            state.getCurrentStone().nextPlayer().setPlayer_Name(Player2);
+            state.getCurrentStone().nextPlayer();
+            state.setPlayer2(Player2);
         }while(Player2.equals(null) || Player2.length() < 1);
 
+        log.info("Player 1 name: " + Player1 + "\n" + "Player 2 name: " + Player2 + "\n");
 
         System.out.println("\n" + state);
         Moves reader = new Moves();
@@ -52,7 +70,7 @@ public class Game {
             BoardCell cells = null;
 
             do {
-                System.out.printf("%s's move: ", state.getCurrentStone().getPlayer_Name());
+                System.out.printf("%s's move: ", state.getPlayer());
                 cells = reader.readMove(state);
 
             }while (cells == null);
@@ -60,31 +78,40 @@ public class Game {
             System.out.println(state);
         }
         if (state.getWinner() != null) {
-            System.out.println(state.getWinner().getPlayer_Name() + " won");
+            state.setCurrentStone(state.getWinner());
+            log.info(state.getPlayer() + " won" + "with " + state.getPlayerMoves() + " moves.");
+
+            injector = Guice.createInjector(new PersistenceModule("board_game"));
+            gameResultDao = injector.getInstance(GameResultDao.class);
+            GameResult winner = GameResult.builder()
+                    .player(state.getPlayer())
+                    .solved(true)
+                    .moves(state.getPlayerMoves())
+                    .timestamp(ZonedDateTime.now())
+                    .build();
+            state.setCurrentStone(state.getRunner());
+            GameResult runner = GameResult.builder()
+                    .player(state.getPlayer())
+                    .solved(false)
+                    .moves(state.getPlayerMoves())
+                    .timestamp(ZonedDateTime.now())
+                    .build();
+            gameResultDao.persist(winner);
+            gameResultDao.persist(runner);
+
+            List<GameResult> highscore = gameResultDao.findBest(5);
+
+            for (GameResult score : highscore){
+                System.out.println(score);
+            }
 
         }
         else {
             System.out.println("Draw");
         }
 
-        Injector injector = Guice.createInjector(new PersistenceModule("board_game"));
-        GameResultDao gameResultDao = injector.getInstance(GameResultDao.class);
-
-            GameResult result = GameResult.builder()
-                    .player(String.valueOf(state.getWinner().getPlayer_Name()))
-                    .solved(state.isGameOver())
-                    .score(state.getWinner().getNumberOfSteps())
-                    .timestamp(ZonedDateTime.now())
-                    .build();
-
-        gameResultDao.persist(result);
-        System.out.println(result);
-
-        List<GameResult> resultList = gameResultDao.findBest(2);
-
-        for(GameResult gameResult : resultList) {
-            System.out.println(gameResult.toString());
-        }
-
     }
+
+
 }
+

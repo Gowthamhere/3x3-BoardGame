@@ -3,6 +3,9 @@ package util.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.jpa.JpaPersistModule;
 
+/**
+ * A class for the Persistence Module.
+ */
 public class PersistenceModule extends AbstractModule {
 
     private String jpaUnit;

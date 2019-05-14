@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
-
+/**
+ * Class representing the result of the game.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,15 +22,27 @@ public class GameResult {
     @GeneratedValue
     private int id;
 
+    /**
+     * The name of the player.
+     */
     @Column(nullable = false)
     private String player;
 
+    /**
+     * Whether the game is solved.
+     */
     @Column(nullable = false)
     private boolean solved;
 
+    /**
+     * Number of moves made by the player.
+     */
     @Column(nullable = false)
-    private int score;
+    private int moves;
 
+    /**
+     * The timestamp of the players.
+     */
     @Column(nullable = false)
     private ZonedDateTime timestamp;
 
