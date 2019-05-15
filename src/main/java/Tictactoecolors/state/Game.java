@@ -33,7 +33,7 @@ public class Game {
         String Player1;
         String Player2;
         System.out.println("--------3 X 3 Board Game--------\n");
-        System.out.print("Please choose a color to play with Red, Yellow, Green: ");
+        System.out.print("Please choose a color to play with Red, Yellow, Green default is Red: ");
         switch (scanner.nextLine()) {
             case "red":
                 state.setCurrentStone(Stones.P1_REDSTONE);
@@ -44,6 +44,9 @@ public class Game {
             case "green":
                 state.setCurrentStone(Stones.P1_GREENSTONE);
                 break;
+            default:
+                state.setCurrentStone(Stones.P1_REDSTONE);
+                break;
         }
 
 
@@ -51,18 +54,19 @@ public class Game {
             System.out.print("Player 1, enter your name: ");
             Player1 = scanner.nextLine();
             state.getCurrentStone();
-            state.setPlayer1(Player1);
 
         }while(Player1.equals(null) || Player1.length() < 1);
+        state.setPlayer1(Player1);
 
         do {
             System.out.print("Player 2, enter your name: ");
             Player2 = scanner.nextLine();
             state.getCurrentStone().nextPlayer();
-            state.setPlayer2(Player2);
         }while(Player2.equals(null) || Player2.length() < 1);
+        state.setPlayer2(Player2);
 
-        log.info("Player 1 name: " + Player1 + "\n" + "Player 2 name: " + Player2 + "\n");
+        log.info("Player 1 name: " + Player1);
+        log.info("Player 2 name: " + Player2);
 
         System.out.println("\n" + state);
         Moves reader = new Moves();
@@ -79,7 +83,7 @@ public class Game {
         }
         if (state.getWinner() != null) {
             state.setCurrentStone(state.getWinner());
-            log.info(state.getPlayer() + " won" + "with " + state.getPlayerMoves() + " moves.");
+            log.info(state.getPlayer() + " won with " + state.getPlayerMoves() + " moves.");
 
             injector = Guice.createInjector(new PersistenceModule("board_game"));
             gameResultDao = injector.getInstance(GameResultDao.class);
@@ -89,6 +93,7 @@ public class Game {
                     .moves(state.getPlayerMoves())
                     .timestamp(ZonedDateTime.now())
                     .build();
+            gameResultDao.persist(winner);
             state.setCurrentStone(state.getRunner());
             GameResult runner = GameResult.builder()
                     .player(state.getPlayer())
@@ -96,7 +101,6 @@ public class Game {
                     .moves(state.getPlayerMoves())
                     .timestamp(ZonedDateTime.now())
                     .build();
-            gameResultDao.persist(winner);
             gameResultDao.persist(runner);
 
             List<GameResult> highscore = gameResultDao.findBest(5);
