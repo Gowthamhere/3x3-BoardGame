@@ -2,6 +2,7 @@ package Tictactoecolors.state;
 
 import lombok.extern.slf4j.Slf4j;
 
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import java.util.Scanner;
 
 /**
@@ -25,7 +26,11 @@ public class Moves {
     public BoardCell readMove(Stones_State state){
 
         if (state.isGameOver()){
-            throw new IllegalStateException("Game Over!!!");
+            try {
+                throw new IllegalStateException("Game Over");
+            } catch (IllegalStateException e){
+                System.err.println(e.getMessage());
+            }
         }
 
         try {
@@ -37,23 +42,36 @@ public class Moves {
             String[] input = null;
             input = scanMove.nextLine().trim().split("\\s+");
             if (input.length != 2) {
-                log.error(state.getPlayer() + " had invalid number of arguments.");
-                throw new IllegalArgumentException("Please check your argument");
+                log.error("{} had invalid number of arguments.", state.getPlayer());
+                try {
+                    throw new IllegalArgumentException("Please check your argument");
+                } catch (IllegalArgumentException e){
+                    System.out.println(e.getMessage());
+                }
             }
 
             int row = Integer.parseInt(input[0]);
             int column = Integer.parseInt(input[1]);
 
             if (!state.checkBounds(row, column)) {
-                log.error(state.getPlayer() + " tried to input in a cell that is out of bonds");
-                throw new IllegalMoveException("Out of Bounds");
+                log.error("{} tried to input in a cell that is out of bonds", state.getPlayer());
+                try {
+                    throw new IllegalMoveException("Out of Bounds");
+                }catch (IllegalMoveException e){
+                    System.out.println(e.getMessage());
+                }
             }
 
             if (!state.validMove(row, column)) {
-                log.error(state.getPlayer() + " tried to input already filled place");
-                throw new IllegalMoveException("Not a Valid Move");
+                log.error("{} tried to input already filled place", state.getPlayer());
+                try {
+                    throw new IllegalMoveException("Not a Valid Move");
+                }catch (IllegalMoveException e){
+                    System.out.println(e.getMessage());
+                    return null;
+                }
             } else {
-               return new BoardCell(row, column);
+                return new BoardCell(row, column);
             }
 
         }catch (Exception ex){
@@ -62,7 +80,7 @@ public class Moves {
                 log.error(state.getPlayer() + "gave a character instead of integer.");
             }
             else {
-                ex.printStackTrace();
+                System.out.println(ex.getMessage());
             }
             return null;
         }

@@ -1,11 +1,13 @@
 package Tictactoecolors.state;
 import Tictactoecolors.result.GameResult;
 import Tictactoecolors.result.GameResultDao;
+import com.github.lalyos.jfiglet.FigletFont;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import lombok.extern.slf4j.Slf4j;
 import util.guice.PersistenceModule;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Scanner;
@@ -104,10 +106,21 @@ public class Game {
             gameResultDao.persist(runner);
 
             List<GameResult> highscore = gameResultDao.findBest(5);
-
-            for (GameResult score : highscore){
-                System.out.println(score);
+            String highscores = "";
+            try {
+               highscores = FigletFont.convertOneLine("HighScores");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            System.out.println(highscores);
+            String table = "| %-15s | %-4d |%n";
+            System.out.format("+-----------------+------+%n");
+            System.out.format("| Name         | Moves   |%n");
+            System.out.format("+-----------------+------+%n");
+            for (GameResult score : highscore){
+                System.out.format(table, score.getPlayer(), score.getMoves());
+            }
+            System.out.format("+-----------------+------+%n");
 
         }
         else {

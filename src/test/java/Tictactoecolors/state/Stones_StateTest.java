@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Stones_StateTest {
+public class Stones_StateTest {
 
 
     @Test

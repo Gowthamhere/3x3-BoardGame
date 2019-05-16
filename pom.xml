@@ -15,7 +15,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <exec.cleanupDaemonThreads>false</exec.cleanupDaemonThreads>
         <dependency.locations.enabled>false</dependency.locations.enabled>
-        <exec.mainClass></exec.mainClass>
+        <exec.mainClass>Tictactoecolors.state.Game</exec.mainClass>
 
     </properties>
 
@@ -103,6 +103,11 @@
             <artifactId>h2</artifactId>
             <version>1.4.199</version>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.lalyos</groupId>
+            <artifactId>jfiglet</artifactId>
+            <version>0.0.8</version>
         </dependency>
     </dependencies>
     <build>
